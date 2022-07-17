@@ -1,0 +1,60 @@
+import csv
+import numpy as np
+
+
+
+def loadPDGeom3D(filename):
+    with open(filename, newline='\n') as f:
+        reader = csv.reader(f)
+        PDGeo = []
+        count = 0;
+        try:
+            for row in reader:
+                row = row[0].split("  ")
+                row = row[1:] #eliminates an extra space that the numbers have infront
+                parsedRow = []
+                for col in range(len(row)):
+                    if count == 0:
+                        nodeNum = int(row[col])
+                    else:
+                        parsedRow.append(float(row[col]))  
+                    count= count + 1
+                PDGeo.append(parsedRow)
+        except csv.Error as e:
+            sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
+    return nodeNum, np.asarray(PDGeo[1:])
+
+
+
+def inputForPDDO():
+    dataPath = "../data/"
+    with open(dataPath + "PDopr.inp") as fp:
+        line = fp.readline() #reads first line
+        PDGeoFileName = fp.readline() #reads second line with the PDDO geometry file name
+        line = fp.readline() #reads third line
+        atype = fp.readline()
+        print(atype.split("  "))
+
+        a = input('').split(" ")[0]
+
+
+
+def main():
+    
+    inputForPDDO()
+
+
+    #PDGeomPath = '../data/PDgeom3D.dat'
+    #[nodeNum, PDGeo] = loadPDGeom3D(PDGeomPath) 
+    #print(nodeNum)
+    #print(PDGeo[0])
+    #np.savetxt("/home/doctajfox/Documents/Thesis_Research/PDDOHeatDiffusionEquationPython/data/PDGeo5.dat",PDGeo,delimiter=",")
+
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+

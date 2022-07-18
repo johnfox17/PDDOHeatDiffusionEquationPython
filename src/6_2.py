@@ -1,34 +1,20 @@
-import csv
-import numpy as np
+#import csv
+#import numpy as np
 
+inputsPath = "../inputs/"
 
-
-def loadPDGeom3D(filename):
-    with open(filename, newline='\n') as f:
-        reader = csv.reader(f)
+def loadPDGeoInput():
+    PDGeoInput = str(inputsPath + "PDgeom3D.dat")
+    with open(PDGeoInput, newline='\n') as fp:
         PDGeo = []
-        count = 0;
-        try:
-            for row in reader:
-                row = row[0].split("  ")
-                row = row[1:] #eliminates an extra space that the numbers have infront
-                parsedRow = []
-                for col in range(len(row)):
-                    if count == 0:
-                        nodeNum = int(row[col])
-                    else:
-                        parsedRow.append(float(row[col]))  
-                    count= count + 1
-                PDGeo.append(parsedRow)
-        except csv.Error as e:
-            sys.exit('file {}, line {}: {}'.format(filename, reader.line_num, e))
-    return nodeNum, np.asarray(PDGeo[1:])
-
-
+        totalNodes = int(fp.readline())
+        for i in range(totalNodes):
+            line = list(map(float,fp.readline().split()))
+            PDGeo.append(line)
 
 def inputForPDDO():
-    dataPath = "../data/"
-    with open(dataPath + "PDopr.inp") as fp:
+    PDoprInput = inputsPath + "PDopr.inp"
+    with open(PDoprInput) as fp:
         line = fp.readline() #file name
         PDGeoFileName = fp.readline() #file name
         line = fp.readline() #atype, morder, n1order, n2order, n3order, timeFlag, ftype
@@ -77,14 +63,14 @@ def inputForPDDO():
             for i in range(nout):
                 line = fp.readline().split()
                 numOut.append(list(map(int,line)))
-
+        loadPDGeoInput()
 
 
 def main():
     
     inputForPDDO()
 
-    a = input('').split(" ")[0]
+    #a = input('').split(" ")[0]
     #PDGeomPath = '../data/PDgeom3D.dat'
     #[nodeNum, PDGeo] = loadPDGeom3D(PDGeomPath) 
     #print(nodeNum)

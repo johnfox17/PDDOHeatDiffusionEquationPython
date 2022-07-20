@@ -1,28 +1,30 @@
 import numpy as np
 import sklearn
 import math
-
+from sklearn.neighbors import KDTree
 
 inputsPath = "../inputs/"
 
 def extractCoordinates():
-    global coordinates
+    global coordinates, deltas
     coordinates = []
+    deltas = []
     if aType == 0 :
         for i in range(totalNodes):
-            aux = [PDGeo[i][0], PDGeo[i][1], PDGeo[i][2], PDGeo[i][3], PDGeo[i][4]]
-            coordinates.append(aux)    
+            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
+            deltas.append([PDGeo[i][3], PDGeo[i][4]])
+
     else:
         for i in range(totalNodes):
-            aux = [PDGeo[i][0], PDGeo[i][1], PDGeo[i][2], PDGeo[i][3]]
-            coordinates.append(aux)
+            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
+            deltas.append([PDGeo[i][3], PDGeo[i][4],  PDGeo[i][5],  PDGeo[i][6]])
     coordinates = np.array(coordinates)
-
+    deltas = np.array(deltas)
 def loadPDGeoInput():
 
     global totalNodes, PDGeo
 
-    PDGeoInput = str(inputsPath + "PDgeom3D.dat")
+    PDGeoInput = str(inputsPath + "PDgeom2D.dat")
     with open(PDGeoInput, newline='\n') as fp:
         PDGeo = []
         totalNodes = int(fp.readline())
@@ -49,15 +51,8 @@ def inputForPDDO():
         n2order = int(line[3])
         n3order = int(line[4])
         timeFlag = int(line[5])
-        line = fp.readline() #family type
-        fType = int(fp.readline())
-        line = fp.readline() #delx dely delz
-        deltas = fp.readline().split()
-        delx = float(deltas[0].replace("d","e"))
-        dely = float(deltas[1].replace("d","e"))
-        delz = float(deltas[2].replace("d","e"))
         line = fp.readline() #number of diff. operators
-        numDiffOps = int(fp.readline())
+        numDiffOps = int(fp.readline()) 
         line = fp.readline() #n1
         if numDiffOps > 0:
             numberDiffOperators = []
@@ -88,11 +83,25 @@ def inputForPDDO():
                 numOut.append(list(map(int,line)))
         loadPDGeoInput()
 
+def generateNodeFamilies():
+    global nodeFamiliesIdx
+    #in this case I dont think that the deltas are defined correctly in the PDGeo input file
+    #It's defined at a horizon of 2*delta and I want 3*delta so im going to overwrite my own delta_mag
+    delta_mag = totalNodes*[0.0315]
+    X = coordinates[:,:3]
+    tree = KDTree(X, leaf_size=2)
+    nodeFamiliesIdx, dist = tree.query_radius(X, r = delta_mag, sort_results=True, return_distance=True)
+    
+
+
+
 def main():
     
     inputForPDDO()
-    print(coordinates)
-    #a = input('').split(" ")[0]
+    generateNodeFamilies()
+    for i in range(totalNodes):
+        print(nodeFamiliesIdx[i])
+        a = input('').split(" ")[0]
     #PDGeomPath = '../data/PDgeom3D.dat'
     #[nodeNum, PDGeo] = loadPDGeom3D(PDGeomPath) 
     #print(nodeNum)

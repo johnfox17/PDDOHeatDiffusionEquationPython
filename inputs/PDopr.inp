@@ -1,39 +1,24 @@
 #file name
-PDgeom3D.dat
-#atype, morder, n1order, n2order, n3order, timeFlag, ftype
-1  3  2  2  1  0
-#family type
-0
-#delx dely delz
-0.1508d0  0.1508d0 0.1508d0
+PDgeom2D.dat
+#atype, morder, n1order, n2order, n3order, timeFlag
+1  2  2  1  0  2
 #number of diff. operators
-4
+2
 #n1
-2 0 0
-0 2 0
-0 0 1
-0 0 0
+2 0
+0 1
 #num of bc
-5
+3
 #bc1: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val (applying df/dx(0,t_bar)=0)
--0.005d0 0.005d0   -0.005  1.005d0 -0.005  1.005d0 1
-0  0 0  1.0d0 0.0d0
+-0.005d0 0.005d0   0.005  1.005d0  1
+1  0  1.0d0    0.0d0
 #bc2: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val (applying df/dx(1,t_bar)=q/(5k))
-0.995d0  1.005d0   -0.005  1.005d0 -0.005  1.005d0 1
-0  0 0  1.0d0 0.0d0
+0.995d0  1.005d0   0.005d0  1.005d0  1
+1  0  1.0d0    20.0d0
 #bc3: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val (applying f(x_bar,0)=0)
--0.005d0 1.005d0  -0.005d0  0.005d0 -0.005d0 1.005d0 1
-0  0 0  1.0d0 0.0d0
-#bc4: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val (applying f(x_bar,0)=0)
--0.005d0 1.005d0  0.995d0  1.005d0 -0.005d0 1.005d0 1
-0  0 0  1.0d0 0.0d0
-#bc5: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val (applying df/dx(0,t_bar)=0)
--0.005  1.005d0   -0.005  1.005d0 -0.005d0 0.005d0 1
-0  0 0  1.0d0  0.0d0
-#nout
-0
-#n1
-1  0  0
-2  0  0
-
-
+-0.005d0 1.005d0  -0.005d0  0.005d0  1
+0  0  1.0d0    0.0d0
+#num of output ops.
+1
+#n1, n2
+0 0

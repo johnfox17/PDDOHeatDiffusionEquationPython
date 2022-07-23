@@ -19,3 +19,13 @@ class PDDOOperator:
          self.numOut = 0
          self.nwk = 0
 
+class Geometry:
+    def __init__(self):
+        self.totalNodes = 0
+        self.coordinates = 0
+        self.deltaVolumes = 0
+        self.deltaCoordinates = 0
+        self.nodeFamiliesIdx = 0
+
+
+

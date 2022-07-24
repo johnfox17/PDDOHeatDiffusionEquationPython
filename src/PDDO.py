@@ -1,5 +1,6 @@
 import math
 import numpy as np
+
 def getSize2D(n1order, n2order):
     if (n1order==2 and n2order==1):
         nsize = 4
@@ -23,14 +24,14 @@ def pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag):
         pList = np.array([1.0, xsi1p, xsi2p, xsi1p**2, xsi1p*xsi2p, xsi2p**2])
     return pList
 
-def FormDiffAmat2D(morder, n1order, n2order, k, Geometry):
-    deltaMag = math.sqrt(Geometry.deltaCoordinates[k][0]**2+Geometry.deltaCoordinates[k][1]**2)
+def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
+    deltaMag = math.sqrt(Geometry.deltaCoordinates[iCurrentNode][0]**2+Geometry.deltaCoordinates[iCurrentNode][1]**2)
     nsize = getSize2D(n1order, n2order)
     DiffAmat2D = np.zeros((nsize,nsize))
-    for iFamilyMember in Geometry.nodeFamiliesIdx[k]:
-        if k != iFamilyMember:
-            xsi1 = Geometry.coordinates[k][0] - Geometry.coordinates[iFamilyMember][0]
-            xsi2 = Geometry.coordinates[k][1]- Geometry.coordinates[iFamilyMember][1]
+    for iFamilyMember in Geometry.nodeFamiliesIdx[iCurrentNode]:
+        if iCurrentNode != iFamilyMember:
+            xsi1 = Geometry.coordinates[iCurrentNode][0] - Geometry.coordinates[iFamilyMember][0]
+            xsi2 = Geometry.coordinates[iCurrentNode][1]- Geometry.coordinates[iFamilyMember][1]
             pList = pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
             weights = weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
             DiffAmat2D+=weights*np.outer(pList,pList)

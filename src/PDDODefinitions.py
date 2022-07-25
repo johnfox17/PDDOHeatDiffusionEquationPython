@@ -9,7 +9,7 @@ class PDDOOperator:
          self.nsize = 0
          self.nskip = 0
          self.morder = 0
-         self.asymFlag = False
+         self.asymFlag = 0
          self.numBC = 0
          self.BC = 0
          self.nteqs = 0

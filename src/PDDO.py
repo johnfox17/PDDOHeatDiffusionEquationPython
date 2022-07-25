@@ -1,6 +1,25 @@
 import math
 import numpy as np
 
+
+def ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry):
+    tol = 0.003
+    #print(diffAMat)
+    #print(diffAMat[:,1])
+    #a = input('').split(" ")[0]
+    if(n1order >= 1 and n2order>=1 ):
+        if(asymFlag == 1 and Geometry.coordinates[iCurrentNode][1] < tol):
+            diffAMat[:,1] = 0.0
+            diffAMat[1,:] = 0.0
+            diffAMat[1,1] = 1.0
+        if(asymFlag == 2 and Geometry.coordinates[iCurrentNode][2] < tol ):
+            diffAMat[:,2] = 0.0
+            diffAMat[2,:] = 0.0
+            diffAMat[2,2] = 1.0
+    
+    return diffAMat 
+
+
 def getSize2D(n1order, n2order):
     if (n1order==2 and n2order==1):
         nsize = 4
@@ -34,7 +53,7 @@ def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
             xsi2 = Geometry.coordinates[iCurrentNode][1]- Geometry.coordinates[iFamilyMember][1]
             pList = pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
             weights = weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
-            DiffAmat2D+=weights*np.outer(pList,pList)
+            DiffAmat2D+=weights*np.outer(pList,pList)*Geometry.deltaVolumes[iFamilyMember]
 
     return DiffAmat2D 
 
@@ -43,9 +62,11 @@ def SetupODEMatrixVector2D(PDDOOperator, Geometry):
     n1order = PDDOOperator.n1order
     n2order = PDDOOperator.n2order
     morder = PDDOOperator.morder
+    asymFlag = PDDOOperator.asymFlag
     for iCurrentNode in range(Geometry.totalNodes):
-        diffAmat = FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry)
-        print(diffAmat)
+        diffAMat = FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry)
+        diffAMat = ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry)
+        print(diffAMat)
         a = input('').split(" ")[0]
     return 0
 

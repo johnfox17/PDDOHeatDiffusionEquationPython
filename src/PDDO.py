@@ -4,9 +4,6 @@ import numpy as np
 
 def ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry):
     tol = 0.003
-    #print(diffAMat)
-    #print(diffAMat[:,1])
-    #a = input('').split(" ")[0]
     if(n1order >= 1 and n2order>=1 ):
         if(asymFlag == 1 and Geometry.coordinates[iCurrentNode][1] < tol):
             diffAMat[:,1] = 0.0
@@ -57,8 +54,9 @@ def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
 
     return DiffAmat2D 
 
-
-def SetupODEMatrixVector2D(PDDOOperator, Geometry):
+def inverse2(nsize, DiffAmat2D, DiffAmatInv2D, k, rcond):
+    return 0 
+def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
     n1order = PDDOOperator.n1order
     n2order = PDDOOperator.n2order
     morder = PDDOOperator.morder

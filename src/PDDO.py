@@ -1,6 +1,17 @@
 import math
 import numpy as np
-def bOperator2D( n1order, n2order, nsize, n1, n2):
+
+def ApplyConstraintOnBvec2D(n1order, n2order, iCurrentNode, PDDOOperator, Geometry, diffBVec2D):
+    tol = 1e-5              
+    if(n1order >= 1 and n2order>=1):
+        if(PDDOOperator.asymFlag == 1 and Geometry.coordinates[k][1] < tol ):
+            diffBVec2D[1] = 0.0
+        if(PDDOOperator.asymFlag == 2 and Geometry.coordinates[k][2] < tol ):
+            diffBVec2D[2] = 0.0
+    
+    return diffBVec2D
+
+def FormDiffBVec2D( n1order, n2order, nsize, n1, n2):
     blist = [0.0]*nsize
     fn1 = 1
     fn2 = 1
@@ -85,8 +96,6 @@ def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
 
     return DiffAmat2D 
 
-def inverse2(nsize, DiffAmat2D, DiffAmatInv2D, k, rcond):
-    return 0 
 def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
     n1order = PDDOOperator.n1order
     n2order = PDDOOperator.n2order
@@ -98,13 +107,16 @@ def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
         diffAMat = ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry)
         coefsCurrentNode = coefs[iCurrentNode]
         for iDiff in range(PDDOOperator.numDiffOps):
+            DiffAvec = np.zeros((nsize,nsize))
             n1 = PDDOOperator.diffOps[iDiff][0]
             n2 = PDDOOperator.diffOps[iDiff][1]
             coef = coefsCurrentNode[iDiff]
-            #diffBVec = FormDiffBVec2D(n1order, n2order, nsize)
-            diffBVec = bOperator2D( n1order, n2order, nsize, n1, n2)
-            print(diffBVec)
-            print(n1,n2)
-            a = input('').split(" ")[0]
+            diffBVec2D = FormDiffBVec2D( n1order, n2order, nsize, n1, n2)
+            diffBVec2D = ApplyConstraintOnBvec2D(n1order, n2order, iCurrentNode, PDDOOperator, Geometry, diffBVec2D)
+            diffAvec = np.linalg.solve(diffAMat,diffBVec2D)
+            #print(diffAMat)
+            #print(diffBVec2D)
+            #print(diffAvec)
+            #a = input('').split(" ")[0]
     return 0
 

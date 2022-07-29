@@ -4,6 +4,12 @@ import math
 from sklearn.neighbors import KDTree
 import PDDODefinitions
 
+def extractDiffCoef(PDGeo, totalNodes):
+    coef = []
+    for i in range(totalNodes):
+        coef.append([PDGeo[i][7], PDGeo[i][8], PDGeo[i][9]])
+    return np.array(coef)
+
 def extractCoordinates(PDGeo,totalNodes, aType):
     Geometry =  PDDODefinitions.Geometry()
     coordinates = []

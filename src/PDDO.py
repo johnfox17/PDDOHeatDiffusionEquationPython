@@ -1,12 +1,51 @@
 import math
 import numpy as np
 
+def ApplyConstraintOnBvec2D(n1order, n2order, iCurrentNode, PDDOOperator, Geometry, diffBVec2D):
+    tol = 1e-5              
+    if(n1order >= 1 and n2order>=1):
+        if(PDDOOperator.asymFlag == 1 and Geometry.coordinates[k][1] < tol ):
+            diffBVec2D[1] = 0.0
+        if(PDDOOperator.asymFlag == 2 and Geometry.coordinates[k][2] < tol ):
+            diffBVec2D[2] = 0.0
+    
+    return diffBVec2D
+
+def FormDiffBVec2D( n1order, n2order, nsize, n1, n2):
+    blist = [0.0]*nsize
+    fn1 = 1
+    fn2 = 1
+    if n1!=0:
+        fn1=fn1*n1
+    if n2!=0:
+        fn2=fn2*n2
+    coef = fn1*fn2
+    iterm = 0
+    if( n1order >=0 and n2order >= 0 ):
+        iterm = iterm 
+        if( n1 == 0 and n2 == 0 ):
+            m = iterm
+        
+        if( n1order >= 1 ):
+            iterm = iterm + 1
+            if( n1 == 1 and n2 == 0 ):
+                m = iterm
+        
+        if( n2order >= 1 ):
+            iterm = iterm + 1
+            if( n1 == 0 and n2 == 1 ): 
+                m = iterm
+        
+        if( n1order >= 2 ):
+            iterm = iterm + 1
+            if( n1 == 2 and n2 == 0 ):
+                m = iterm
+        blist[m] = coef
+    return blist
+
 
 def ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry):
     tol = 0.003
-    #print(diffAMat)
-    #print(diffAMat[:,1])
-    #a = input('').split(" ")[0]
     if(n1order >= 1 and n2order>=1 ):
         if(asymFlag == 1 and Geometry.coordinates[iCurrentNode][1] < tol):
             diffAMat[:,1] = 0.0
@@ -57,16 +96,27 @@ def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
 
     return DiffAmat2D 
 
-
-def SetupODEMatrixVector2D(PDDOOperator, Geometry):
+def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
     n1order = PDDOOperator.n1order
     n2order = PDDOOperator.n2order
     morder = PDDOOperator.morder
     asymFlag = PDDOOperator.asymFlag
+    nsize = getSize2D(n1order, n2order)
     for iCurrentNode in range(Geometry.totalNodes):
         diffAMat = FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry)
         diffAMat = ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry)
-        print(diffAMat)
-        a = input('').split(" ")[0]
+        coefsCurrentNode = coefs[iCurrentNode]
+        for iDiff in range(PDDOOperator.numDiffOps):
+            DiffAvec = np.zeros((nsize,nsize))
+            n1 = PDDOOperator.diffOps[iDiff][0]
+            n2 = PDDOOperator.diffOps[iDiff][1]
+            coef = coefsCurrentNode[iDiff]
+            diffBVec2D = FormDiffBVec2D( n1order, n2order, nsize, n1, n2)
+            diffBVec2D = ApplyConstraintOnBvec2D(n1order, n2order, iCurrentNode, PDDOOperator, Geometry, diffBVec2D)
+            diffAvec = np.linalg.solve(diffAMat,diffBVec2D)
+            #print(diffAMat)
+            #print(diffBVec2D)
+            #print(diffAvec)
+            #a = input('').split(" ")[0]
     return 0
 

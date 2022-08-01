@@ -2,6 +2,7 @@
 class PDDOOperator:
     def __init__(self):
          self.numDiffOps = 0
+         self.diffOps = 0
          self.norder = 0
          self.n1order = 0
          self.n2order = 0
@@ -26,6 +27,7 @@ class Geometry:
         self.deltaVolumes = 0
         self.deltaCoordinates = 0
         self.nodeFamiliesIdx = 0
+        self.boundaries = 0
 
 
 

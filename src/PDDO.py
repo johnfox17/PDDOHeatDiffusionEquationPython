@@ -85,16 +85,17 @@ def pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag):
 def FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry):
     deltaMag = math.sqrt(Geometry.deltaCoordinates[iCurrentNode][0]**2+Geometry.deltaCoordinates[iCurrentNode][1]**2)
     nsize = getSize2D(n1order, n2order)
-    DiffAmat2D = np.zeros((nsize,nsize))
+    diffAmat2D = np.zeros((nsize,nsize))
     for iFamilyMember in Geometry.nodeFamiliesIdx[iCurrentNode]:
         if iCurrentNode != iFamilyMember:
             xsi1 = Geometry.coordinates[iCurrentNode][0] - Geometry.coordinates[iFamilyMember][0]
             xsi2 = Geometry.coordinates[iCurrentNode][1]- Geometry.coordinates[iFamilyMember][1]
             pList = pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
             weights = weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
-            DiffAmat2D+=weights*np.outer(pList,pList)*Geometry.deltaVolumes[iFamilyMember]
+            diffAmat2D+=weights*np.outer(pList,pList)*Geometry.deltaVolumes[iFamilyMember]
 
-    return DiffAmat2D 
+    return diffAmat2D 
+
 
 def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
     n1order = PDDOOperator.n1order
@@ -102,21 +103,31 @@ def SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs):
     morder = PDDOOperator.morder
     asymFlag = PDDOOperator.asymFlag
     nsize = getSize2D(n1order, n2order)
+    SpSysMat = []
     for iCurrentNode in range(Geometry.totalNodes):
         diffAMat = FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, Geometry)
         diffAMat = ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, Geometry)
         coefsCurrentNode = coefs[iCurrentNode]
         for iDiff in range(PDDOOperator.numDiffOps):
-            DiffAvec = np.zeros((nsize,nsize))
             n1 = PDDOOperator.diffOps[iDiff][0]
             n2 = PDDOOperator.diffOps[iDiff][1]
+            print(n1,n2)
             coef = coefsCurrentNode[iDiff]
             diffBVec2D = FormDiffBVec2D( n1order, n2order, nsize, n1, n2)
             diffBVec2D = ApplyConstraintOnBvec2D(n1order, n2order, iCurrentNode, PDDOOperator, Geometry, diffBVec2D)
-            diffAvec = np.linalg.solve(diffAMat,diffBVec2D)
-            #print(diffAMat)
-            #print(diffBVec2D)
-            #print(diffAvec)
-            #a = input('').split(" ")[0]
+            diffAVec = np.linalg.solve(diffAMat,diffBVec2D)
+            
+            deltaMag = math.sqrt(Geometry.deltaCoordinates[iCurrentNode][0]**2+Geometry.deltaCoordinates[iCurrentNode][1]**2)
+            for iFamilyMember in Geometry.nodeFamiliesIdx[iCurrentNode]:
+                if iCurrentNode != iFamilyMember:
+                    xsi1 = Geometry.coordinates[iCurrentNode][0] - Geometry.coordinates[iFamilyMember][0]
+                    xsi2 = Geometry.coordinates[iCurrentNode][1]- Geometry.coordinates[iFamilyMember][1]
+                    pList = pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
+                    weights = weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
+                    gFunVal = np.dot(diffAVec,np.multiply(pList,weights[0]))
+                    #SpSysMat = 
+                    #print(gFunVal)
+                    #print("out")
+                    #a = input('').split(" ")[0]
     return 0
 

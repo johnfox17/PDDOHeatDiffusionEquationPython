@@ -29,16 +29,16 @@ def inputForPDDO():
         PDDOoperator.n1order = int(line[2])
         PDDOoperator.n2order = int(line[3])
         PDDOoperator.n3order = int(line[4])
-        PDDOoperator.nskip = int(line[5])
+        PDDOoperator.asymFlag = int(line[5])
         line = fp.readline() #number of diff. operators
-        numDiffOps = int(fp.readline())
+        PDDOoperator.numDiffOps = int(fp.readline())
         line = fp.readline() #n1
-        if numDiffOps > 0:
+        if PDDOoperator.numDiffOps > 0:
             numberDiffOperators = []
-            for i in range(numDiffOps):
+            for i in range(PDDOoperator.numDiffOps):
                 line = fp.readline().split()
                 numberDiffOperators.append(list(map(int,line)))
-            PDDOoperator.numDiffOps = numberDiffOperators
+            PDDOoperator.diffOps = numberDiffOperators
         line = fp.readline() #num of bc
         PDDOoperator.numBC = int(fp.readline())
         BC = []

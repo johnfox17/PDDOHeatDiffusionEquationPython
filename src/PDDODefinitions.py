@@ -11,8 +11,6 @@ class PDDOOperator:
          self.nskip = 0
          self.morder = 0
          self.asymFlag = 0
-         self.numBC = 0
-         self.BC = 0
          self.nteqs = 0
          self.ncons = 0
          self.aType = 0
@@ -30,4 +28,11 @@ class Geometry:
         self.boundaries = 0
 
 
-
+class DiffEquation:
+    def __init__(self):
+        self.rows = 0
+        self.columns = 0
+        self.solution = 0
+        self.numBC = 0
+        self.BC = 0
+        self.coefs = 0

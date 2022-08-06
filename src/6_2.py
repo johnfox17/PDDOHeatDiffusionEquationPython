@@ -1,37 +1,31 @@
 import numpy as np
 import PDDODefinitions
 import loadInputs
-import geometry
+import Geometry
 import PDDO
 
 #The objective of this function is to count all the rows of our system
 #of equations:
 #1. One row for each node and its family members
 #2. One row of each BC of a specific node
-def getSysMatSize(PDDOOperator, Geometry):
-    nwk = 0
-    #Row for each node
-    for iCurrentNode in range(np.size(Geometry.nodeFamiliesIdx)):
-        nwk +=np.size(Geometry.nodeFamiliesIdx[iCurrentNode])-1
-    
-    print(nwk)
-    print(Geometry.totalNodes)
-    a = input('').split(" ")[0]
-    return
+def getSysMatSize(numBC, totalNodes):
+    rows = totalNodes + numBC
+    columns = totalNodes + numBC
+    return rows, columns
 
 def main():
     #loading input files
-    PDDOOperator, PDGeo, totalNodes = loadInputs.inputForPDDO()
-    #extracting coordinates and deltas of nodes
-    Geometry = geometry.extractCoordinates(PDGeo,totalNodes, PDDOOperator.aType)
+    #PDDOOperator, PDGeo, totalNodes = loadInputs.inputForPDDO()
+    pDDOOperator, geometry, diffEquation = loadInputs.inputForPDDO() 
     #creating node families
-    Geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(Geometry)
-    #Extract Boundaries
-    #Geometry.boundaries = geometry.extractBoundaries(PDDOOperator, Geometry)
+    geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(geometry)
     #get size of system of equations
-    #aux2 = getSysMatSize(PDDOOperator, Geometry)
+    diffEquation.rows, diffEquation.columns = getSysMatSize(diffEquation.numBC, geometry.totalNodes)
     #Extract differential equation coefficients
     #coefs =  geometry.extractDiffCoef(PDGeo, totalNodes);
+    #for i in range(10):
+    #    print(coefs[0])
+    #    a = input('').split(" ")[0]
     #TODO
     #aux = PDDO.SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs)
 

@@ -26,11 +26,6 @@ def main():
     Geometry = geometry.extractCoordinates(PDGeo,totalNodes, PDDOOperator.aType)
     #creating node families
     Geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(Geometry)
-    
-    for i in range(1000):
-        print(Geometry.nodeFamiliesIdx[i])
-        a = input('').split(" ")[0]
-
     #Extract Boundaries
     #Geometry.boundaries = geometry.extractBoundaries(PDDOOperator, Geometry)
     #get size of system of equations

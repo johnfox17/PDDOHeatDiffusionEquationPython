@@ -26,14 +26,19 @@ def main():
     Geometry = geometry.extractCoordinates(PDGeo,totalNodes, PDDOOperator.aType)
     #creating node families
     Geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(Geometry)
+    
+    for i in range(1000):
+        print(Geometry.nodeFamiliesIdx[i])
+        a = input('').split(" ")[0]
+
     #Extract Boundaries
-    Geometry.boundaries = geometry.extractBoundaries(PDDOOperator, Geometry)
+    #Geometry.boundaries = geometry.extractBoundaries(PDDOOperator, Geometry)
     #get size of system of equations
-    aux2 = getSysMatSize(PDDOOperator, Geometry)
+    #aux2 = getSysMatSize(PDDOOperator, Geometry)
     #Extract differential equation coefficients
-    coefs =  geometry.extractDiffCoef(PDGeo, totalNodes);
+    #coefs =  geometry.extractDiffCoef(PDGeo, totalNodes);
     #TODO
-    aux = PDDO.SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs)
+    #aux = PDDO.SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs)
 
     #print(nodeFamiliesIdx[0])
     #inputForPDDO()

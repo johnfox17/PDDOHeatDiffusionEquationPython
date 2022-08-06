@@ -40,7 +40,16 @@ def generateNodeFamilies(Geometry):
     X = Geometry.coordinates[:,:3]
     tree = KDTree(X, leaf_size=2)
     nodeFamiliesIdx, dist = tree.query_radius(X, r = delta_mag, sort_results=True, return_distance=True)
-    return nodeFamiliesIdx
+    
+    asymFam = True
+    nodeFamilies = []
+    if asymFam == True:
+        for iCurrentNode in range(Geometry.totalNodes):
+            idx= np.where(Geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=Geometry.coordinates[iCurrentNode][1])
+            nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
+    else:
+        nodeFamilie = nodeFamiliesIdx
+    return nodeFamilies
 
 def extractBoundaries(PDDOOperator, Geometry):
     morder = PDDOOperator.morder

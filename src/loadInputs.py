@@ -29,7 +29,7 @@ def inputForPDDO():
         PDDOoperator.n1order = int(line[2])
         PDDOoperator.n2order = int(line[3])
         PDDOoperator.n3order = int(line[4])
-        PDDOoperator.nskip = int(line[5])
+        PDDOoperator.asymFlag = int(line[5])
         line = fp.readline() #number of diff. operators
         numDiffOps = int(fp.readline())
         line = fp.readline() #n1

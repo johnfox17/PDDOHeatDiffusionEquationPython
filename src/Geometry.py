@@ -4,34 +4,6 @@ import math
 from sklearn.neighbors import KDTree
 import PDDODefinitions
 
-def extractDiffCoef(PDGeo, totalNodes):
-    coef = []
-    for i in range(totalNodes):
-        coef.append([PDGeo[i][7], PDGeo[i][8], PDGeo[i][9]])
-    return np.array(coef)
-
-def extractCoordinates(PDGeo,totalNodes, aType):
-    Geometry =  PDDODefinitions.Geometry()
-    coordinates = []
-    deltaVolumes = []
-    deltaCoordinates = []
-    if aType == 0 :
-        for i in range(totalNodes):
-            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
-            deltaVolumes.append(PDGeo[i][3]) 
-            deltaCoordinates.append(PDGeo[i][4])
-
-    else:
-        for i in range(totalNodes):
-            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
-            deltaVolumes.append(PDGeo[i][3])
-            deltaCoordinates.append([PDGeo[i][4],  PDGeo[i][5],  PDGeo[i][6]])
-    Geometry.totalNodes = totalNodes
-    Geometry.coordinates = np.array(coordinates)
-    Geometry.deltaVolumes = np.array(deltaVolumes)
-    Geometry.deltaCoordinates = np.array(deltaCoordinates)
-    return Geometry
-
 
 def generateNodeFamilies(Geometry):
     #since in this case all horizons are equal for all nodes but must change later to generalize

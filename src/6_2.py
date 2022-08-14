@@ -2,7 +2,7 @@ import numpy as np
 import PDDODefinitions
 import loadInputs
 import Geometry
-import PDDO
+import PDDOSysMatAndVec
 
 #The objective of this function is to count all the rows of our system
 #of equations:
@@ -15,23 +15,16 @@ def getSysMatSize(numBC, totalNodes):
 
 def main():
     #loading input files
-    #PDDOOperator, PDGeo, totalNodes = loadInputs.inputForPDDO()
     pDDOOperator, geometry, diffEquation = loadInputs.inputForPDDO() 
     #creating node families
-    geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(geometry)
+    geometry.nodeFamiliesIdx = Geometry.generateNodeFamilies(geometry)
     #get size of system of equations
     diffEquation.rows, diffEquation.columns = getSysMatSize(diffEquation.numBC, geometry.totalNodes)
-    #Extract differential equation coefficients
-    #coefs =  geometry.extractDiffCoef(PDGeo, totalNodes);
-    #for i in range(10):
-    #    print(coefs[0])
-    #    a = input('').split(" ")[0]
-    #TODO
-    #aux = PDDO.SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs)
+    #generate system matrix and right hand side vector without BC yet
+    PDDOMatandVec = PDDOSysMatAndVec.PDDOSysMatAndVec(pDDOOperator, geometry, diffEquation)
+    print(PDDOMatandVec.SpSysMat)
+    
 
-    #print(nodeFamiliesIdx[0])
-    #inputForPDDO()
-    #generateNodeFamilies()
     #for i in range(totalNodes):
     #    print(nodeFamiliesIdx[i])
     #    a = input('').split(" ")[0]

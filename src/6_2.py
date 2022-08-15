@@ -1,43 +1,30 @@
 import numpy as np
 import PDDODefinitions
 import loadInputs
-import geometry
-import PDDO
+import Geometry
+import PDDOSysMatAndVec
 
 #The objective of this function is to count all the rows of our system
 #of equations:
 #1. One row for each node and its family members
 #2. One row of each BC of a specific node
-def getSysMatSize(PDDOOperator, Geometry):
-    nwk = 0
-    #Row for each node
-    for iCurrentNode in range(np.size(Geometry.nodeFamiliesIdx)):
-        nwk +=np.size(Geometry.nodeFamiliesIdx[iCurrentNode])-1
-    
-    print(nwk)
-    print(Geometry.totalNodes)
-    a = input('').split(" ")[0]
-    return
+def getSysMatSize(numBC, totalNodes):
+    rows = totalNodes + numBC
+    columns = totalNodes + numBC
+    return rows, columns
 
 def main():
     #loading input files
-    PDDOOperator, PDGeo, totalNodes = loadInputs.inputForPDDO()
-    #extracting coordinates and deltas of nodes
-    Geometry = geometry.extractCoordinates(PDGeo,totalNodes, PDDOOperator.aType)
+    pDDOOperator, geometry, diffEquation = loadInputs.inputForPDDO() 
     #creating node families
-    Geometry.nodeFamiliesIdx = geometry.generateNodeFamilies(Geometry)
-    #Extract Boundaries
-    #Geometry.boundaries = geometry.extractBoundaries(PDDOOperator, Geometry)
+    geometry.nodeFamiliesIdx = Geometry.generateNodeFamilies(geometry)
     #get size of system of equations
-    #aux2 = getSysMatSize(PDDOOperator, Geometry)
-    #Extract differential equation coefficients
-    #coefs =  geometry.extractDiffCoef(PDGeo, totalNodes);
-    #TODO
-    #aux = PDDO.SetupODEMatrixVector2D(PDDOOperator, Geometry, coefs)
+    diffEquation.rows, diffEquation.columns = getSysMatSize(diffEquation.numBC, geometry.totalNodes)
+    #generate system matrix and right hand side vector without BC yet
+    PDDOMatandVec = PDDOSysMatAndVec.PDDOSysMatAndVec(pDDOOperator, geometry, diffEquation)
+    print(PDDOMatandVec.SpSysMat)
+    
 
-    #print(nodeFamiliesIdx[0])
-    #inputForPDDO()
-    #generateNodeFamilies()
     #for i in range(totalNodes):
     #    print(nodeFamiliesIdx[i])
     #    a = input('').split(" ")[0]

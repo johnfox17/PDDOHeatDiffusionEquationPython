@@ -5,7 +5,35 @@ import PDDODefinitions
 
 inputsPath = "../inputs/"
 
-def loadPDGeoInput():
+def extractDiffCoef(PDGeo, totalNodes):
+    coef = []
+    for i in range(totalNodes):
+        coef.append([PDGeo[i][7], PDGeo[i][8], PDGeo[i][9]])
+    return np.array(coef)
+
+
+def extractCoordinates(PDGeo,totalNodes, aType):
+    Geometry =  PDDODefinitions.Geometry()
+    coordinates = []
+    deltaVolumes = []
+    deltaCoordinates = []
+    if aType == 0 :
+        for i in range(totalNodes):
+            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
+            deltaVolumes.append(PDGeo[i][3])
+            deltaCoordinates.append(PDGeo[i][4])
+    else:
+         for i in range(totalNodes):
+            coordinates.append([PDGeo[i][0], PDGeo[i][1], PDGeo[i][2]])
+            deltaVolumes.append(PDGeo[i][3])
+            deltaCoordinates.append([PDGeo[i][4],  PDGeo[i][5],  PDGeo[i][6]])
+            Geometry.totalNodes = totalNodes
+            Geometry.coordinates = np.array(coordinates)
+            Geometry.deltaVolumes = np.array(deltaVolumes)
+            Geometry.deltaCoordinates = np.array(deltaCoordinates)
+    return Geometry
+
+def loadPDGeoInput(pDDOOperator):
     PDGeoInput = str(inputsPath + "PDgeom2D.dat")
     with open(PDGeoInput, newline='\n') as fp:
         PDGeo = []
@@ -14,36 +42,39 @@ def loadPDGeoInput():
             line = list(map(float,fp.readline().split()))
             PDGeo.append(line)
     PDGeo = np.array(PDGeo)
-    return PDGeo, totalNodes
+    Geometry = extractCoordinates(PDGeo,totalNodes, pDDOOperator.aType)
+    return Geometry, PDGeo
 
 def inputForPDDO():
     PDoprInput = inputsPath + "PDopr.inp"
-    PDDOoperator = PDDODefinitions.PDDOOperator() 
+    pDDOoperator = PDDODefinitions.PDDOOperator()
+    diffEquation = PDDODefinitions.DiffEquation()
+
     with open(PDoprInput) as fp:
         line = fp.readline() #file name
         PDGeoFileName = fp.readline() #file name
         line = fp.readline() #atype, morder, n1order, n2order, n3order, timeFlag, ftype
         line = fp.readline().split()
-        PDDOoperator.aType = int(line[0])
-        PDDOoperator.morder = int(line[1])
-        PDDOoperator.n1order = int(line[2])
-        PDDOoperator.n2order = int(line[3])
-        PDDOoperator.n3order = int(line[4])
-        PDDOoperator.asymFlag = int(line[5])
+        pDDOoperator.aType = int(line[0])
+        pDDOoperator.morder = int(line[1])
+        pDDOoperator.n1order = int(line[2])
+        pDDOoperator.n2order = int(line[3])
+        pDDOoperator.n3order = int(line[4])
+        pDDOoperator.asymFlag = int(line[5])
         line = fp.readline() #number of diff. operators
-        PDDOoperator.numDiffOps = int(fp.readline())
+        pDDOoperator.numDiffOps = int(fp.readline())
         line = fp.readline() #n1
-        if PDDOoperator.numDiffOps > 0:
+        if pDDOoperator.numDiffOps > 0:
             numberDiffOperators = []
-            for i in range(PDDOoperator.numDiffOps):
+            for i in range(pDDOoperator.numDiffOps):
                 line = fp.readline().split()
                 numberDiffOperators.append(list(map(int,line)))
-            PDDOoperator.diffOps = numberDiffOperators
+            pDDOoperator.diffOps = numberDiffOperators
         line = fp.readline() #num of bc
-        PDDOoperator.numBC = int(fp.readline())
+        diffEquation.numBC = int(fp.readline())
         BC = []
-        if PDDOoperator.numBC > 0:
-            for i in range(PDDOoperator.numBC):
+        if diffEquation.numBC > 0:
+            for i in range(diffEquation.numBC):
                 aux = []
                 line = fp.readline() #bc1: xmin, xmax, ymin, ymax, num_diff_ops \ n1(1), n2(1), coef(1), ..., val
                 line = fp.readline().split()
@@ -53,15 +84,16 @@ def inputForPDDO():
                 for j in range(len(line)):
                     aux.append(float(line[j].replace("d","e")))
                 BC.append(aux)
-            PDDOoperator.BC = BC
+            diffEquation.BC = BC
         line = fp.readline() #nout
-        PDDOoperator.nout = int(fp.readline())
-        if PDDOoperator.nout>0:
+        pDDOoperator.nout = int(fp.readline())
+        if pDDOoperator.nout>0:
             line = fp.readline() #n1
             numOut = []
-            for i in range(PDDOoperator.nout):
+            for i in range(pDDOoperator.nout):
                 line = fp.readline().split()
                 numOut.append(list(map(int,line)))
-            PDDOoperator.numOut = numOut
-        PDGeo, totalNodes = loadPDGeoInput()
-        return PDDOoperator, PDGeo, totalNodes 
+            pDDOoperator.numOut = numOut
+        geometry, PDGeo = loadPDGeoInput(pDDOoperator)
+        diffEquation.coefs =  extractDiffCoef(PDGeo, geometry.totalNodes);
+        return pDDOoperator, geometry, diffEquation 

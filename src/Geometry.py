@@ -23,12 +23,3 @@ def generateNodeFamilies(Geometry):
         nodeFamilie = nodeFamiliesIdx
     return nodeFamilies
 
-def extractBoundaries(PDDOOperator, Geometry):
-    morder = PDDOOperator.morder
-    BCidx = []
-    if morder==2: #I hard coded it here need to find a way to loop through BCs
-        BC1idx = np.where ( Geometry.coordinates[:,0]<=PDDOOperator.BC[0][1])[0]
-        BC2idx = np.where ( Geometry.coordinates[:,0]>=PDDOOperator.BC[1][0])[0]
-        BC3idx = np.where(Geometry.coordinates[:,1]<=PDDOOperator.BC[2][3])[0]
-        BCidx = [BC1idx,BC2idx,BC3idx]
-    return BCidx

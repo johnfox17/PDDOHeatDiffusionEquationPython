@@ -5,21 +5,30 @@ from sklearn.neighbors import KDTree
 import PDDODefinitions
 
 
-def generateNodeFamilies(Geometry):
+def generateNodeFamilies(geometry):
     #since in this case all horizons are equal for all nodes but must change later to generalize
     #when horizon variables between nodes
-    delta_mag = math.sqrt(Geometry.deltaCoordinates[0][0]**2+Geometry.deltaCoordinates[0][1]**2+Geometry.deltaCoordinates[0][2]**2)
-    X = Geometry.coordinates[:,:3]
+    delta_mag = math.sqrt(geometry.deltaCoordinates[0][0]**2+geometry.deltaCoordinates[0][1]**2+geometry.deltaCoordinates[0][2]**2)
+    X = geometry.coordinates[:,:3]
     tree = KDTree(X, leaf_size=2)
     nodeFamiliesIdx, dist = tree.query_radius(X, r = delta_mag, sort_results=True, return_distance=True)
-    
     asymFam = True
+    eliminateBottomNodes = True
     nodeFamilies = []
     if asymFam == True:
-        for iCurrentNode in range(Geometry.totalNodes):
-            idx= np.where(Geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=Geometry.coordinates[iCurrentNode][1])
-            nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
+        for iCurrentNode in range(geometry.totalNodes):
+            #do to numerical error because of asymmetry (to few nodes within the horizon) we will filter out bottom nodes
+            if eliminateBottomNodes:
+                if geometry.coordinates[iCurrentNode][1]>geometry.deltaCoordinates[0][1]:
+                    idx= np.where(geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=geometry.coordinates[iCurrentNode][1])
+                    nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
+            else:
+                idx= np.where(geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=geometry.coordinates[iCurrentNode][1])
+                nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
     else:
-        nodeFamilie = nodeFamiliesIdx
+        nodeFamilies = nodeFamiliesIdx
+
     return nodeFamilies
+
+
 

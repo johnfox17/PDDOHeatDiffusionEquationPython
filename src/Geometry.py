@@ -17,14 +17,9 @@ def generateNodeFamilies(geometry):
     nodeFamilies = []
     if asymFam == True:
         for iCurrentNode in range(geometry.totalNodes):
-            #do to numerical error because of asymmetry (to few nodes within the horizon) we will filter out bottom nodes
-            if eliminateBottomNodes:
-                if geometry.coordinates[iCurrentNode][1]>geometry.deltaCoordinates[0][1]:
+            if geometry.coordinates[iCurrentNode][1]>geometry.deltaCoordinates[0][1]:
                     idx= np.where(geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=geometry.coordinates[iCurrentNode][1])
                     nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
-            else:
-                idx= np.where(geometry.coordinates[nodeFamiliesIdx[iCurrentNode]][:,1]<=geometry.coordinates[iCurrentNode][1])
-                nodeFamilies.append(nodeFamiliesIdx[iCurrentNode][idx])
     else:
         nodeFamilies = nodeFamiliesIdx
 

@@ -132,8 +132,8 @@ def SetupODEMatrix2D(pDDOOperator, geometry, diffEquation):
                     pList = pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
                     weights = weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
                     gFunVal = np.dot(diffAVec,np.multiply(pList,weights[0]))
-                    #if (math.isnan(gFunVal) != True):
-                    SpSysMat[iNode][iFamilyMember] += coef*gFunVal*geometry.deltaVolumes[iFamilyMember]/(deltaMag**(n1+n2))
+                    if (math.isnan(gFunVal) != True):
+                        SpSysMat[iCurrentNode][iFamilyMember] += coef*gFunVal*geometry.deltaVolumes[iFamilyMember]/(deltaMag**(n1+n2))
         #SysVec[iCurrentNode]= coefs[iCurrentNode][2] ##It's for this case i hardcoded the 2
                     
     return SpSysMat

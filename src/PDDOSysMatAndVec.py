@@ -16,10 +16,12 @@ def SetupODEMatrix2D(pDDOOperator, geometry, diffEquation):
     asymFlag = pDDOOperator.asymFlag
     nsize = PDDOFunctions.getSize2D(n1order, n2order)
     coefs = diffEquation.coefs
-    SpSysMat = np.zeros((geometry.totalNodes,geometry.totalNodes))
+    numberNodes = np.size(geometry.nodeFamiliesIdx)
+    SpSysMat = np.zeros((numberNodes,numberNodes))
     #global SysVec = np.zeros(geometry.totalNodes)
 
-    for iCurrentNode in range(geometry.totalNodes):
+    for iNode in range(numberNodes):
+        iCurrentNode = geometry.nodeFamiliesIdx[iNode][0]
         diffAMat = PDDOFunctions.FormDiffAmat2D(morder, n1order, n2order, iCurrentNode, geometry)
         diffAMat = PDDOFunctions.ApplyConstraintOnAmat2D(asymFlag, n1order, n2order, iCurrentNode, diffAMat, geometry)
         for iDiff in range(pDDOOperator.numDiffOps):
@@ -37,16 +39,17 @@ def SetupODEMatrix2D(pDDOOperator, geometry, diffEquation):
                     pList = PDDOFunctions.pOperator2D(n1order, n2order, xsi1, xsi2, deltaMag)
                     weights = PDDOFunctions.weights2D(n1order, n2order, nsize, xsi1, xsi2, deltaMag)
                     gFunVal = np.dot(diffAVec,np.multiply(pList,weights[0]))
-                    if (math.isnan(gFunVal) != True):
-                        SpSysMat[iCurrentNode][iFamilyMember] += coef*gFunVal*geometry.deltaVolumes[iFamilyMember]/(deltaMag**(n1+n2))
+                    #if (math.isnan(gFunVal) != True):
+                    SpSysMat[iNode][iFamilyMember] += coef*gFunVal*geometry.deltaVolumes[iFamilyMember]/(deltaMag**(n1+n2))
         #SysVec[iCurrentNode]= coefs[iCurrentNode][2] ##It's for this case i hardcoded the 2
                     
     return SpSysMat
 
 def SetupODEVec2D(geometry, diffEquation):
-    SysVec = np.zeros(geometry.totalNodes)
+    numberNodes = np.size(geometry.nodeFamiliesIdx)
+    SysVec = np.zeros(numberNodes)
     coefs = diffEquation.coefs
-    for iCurrentNode in range(geometry.totalNodes):
+    for iCurrentNode in range(numberNodes):
         SysVec[iCurrentNode]= coefs[iCurrentNode][2] ##It's for this case i hardcoded the 2
     return SysVec
 

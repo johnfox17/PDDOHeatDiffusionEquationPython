@@ -3,6 +3,7 @@ import PDDODefinitions
 import loadInputs
 import Geometry
 import PDDOSysMatAndVec
+import PDDOSysBC
 
 #The objective of this function is to count all the rows of our system
 #of equations:
@@ -19,11 +20,12 @@ def main():
     #creating node families
     geometry.nodeFamiliesIdx = Geometry.generateNodeFamilies(geometry)
     #get size of system of equations
-    diffEquation.rows, diffEquation.columns = getSysMatSize(diffEquation.numBC, geometry.totalNodes)
+    diffEquation.rows, diffEquation.columns = getSysMatSize(diffEquation.numBC, np.size(geometry.nodeFamiliesIdx))
     #generate system matrix and right hand side vector without BC yet
     PDDOMatandVec = PDDOSysMatAndVec.PDDOSysMatAndVec(pDDOOperator, geometry, diffEquation)
-    print(PDDOMatandVec.SpSysMat)
-    
+    #PDDOBC = PDDOSysBC.PDDOSysBC(pDDOOperator, geometry, diffEquation)
+    #print(PDDOMatandVec.SpSysMat)
+    #print(diffEquation.BC)
 
     #for i in range(totalNodes):
     #    print(nodeFamiliesIdx[i])
